@@ -1,11 +1,14 @@
-EXERCISES := hello_world
+EXERCISES     := hello_world
+CLEAN_TARGETS := $(addprefix clean-,$(EXERCISES))
 
 all: $(EXERCISES)
 
 $(EXERCISES):
-	$(MAKE) -C $@
+	"$(MAKE)" -C $@
 
-clean:
-	for e in $(EXERCISES); do $(MAKE) -C $$e clean; done
+$(CLEAN_TARGETS):
+	"$(MAKE)" -C $(patsubst clean-%,%,$@) clean
 
-.PHONY: all clean $(EXERCISES)
+clean: $(CLEAN_TARGETS)
+
+.PHONY: all clean $(EXERCISES) $(CLEAN_TARGETS)
