@@ -1,5 +1,5 @@
 hello_world.wasm:
-	@wat2wasm hello_world.wat --enable-multi-value
+	@wat2wasm hello_world.wat
 
 clean:
 	@rm -f hello_world.wasm
