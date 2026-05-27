@@ -5,14 +5,14 @@
 
   (global $nwrittenOffset i32 (i32.const 16))
   (global $iovecOffset i32 (i32.const 32))
-  
+
   (global $iovecLength i32 (i32.const 1))
 
   (memory (export "memory") 1)
-  ;; Initializes the WebAssembly Linear Memory with a UTF-8 string of 14 characters starting at offset 64
+  ;; "Hello, World!\n" = 14 bytes at offset 64; keep the length in $hello in sync if this string changes
   (data (i32.const 64) "Hello, World!\n")
 
-  ;; Returns the base offset and length of the greeting
+  ;; Returns the base offset and byte length of the greeting
   (func $hello (export "hello") (result i32 i32)
     (i32.const 64) (i32.const 14)
   )
