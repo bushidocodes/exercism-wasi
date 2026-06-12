@@ -1,5 +1,6 @@
 (module
   (import "wasi_snapshot_preview1" "fd_write" (func $fd_write (param i32 i32 i32 i32) (result i32)))
+  (import "wasi_snapshot_preview1" "proc_exit" (func $proc_exit (param i32)))
 
   (global $stdout i32 (i32.const 1))
 
@@ -20,6 +21,7 @@
   (func (export "_start")
     (local $offset i32)
     (local $length i32)
+    (local $errno i32)
 
     ;; Multivalue returns are hard to consume directly off the stack. Move to locals to reorder as needed for WASI
     ;; Rightmost argument is on top of stack when returned, so store in reverse
@@ -31,14 +33,19 @@
     (i32.store (global.get $iovecOffset) (local.get $offset))
     (i32.store (i32.add (global.get $iovecOffset) (i32.const 4)) (local.get $length))
 
-    (call $fd_write
-      (global.get $stdout)
-      (global.get $iovecOffset)
-      (global.get $iovecLength)
-      (global.get $nwrittenOffset)
+    (local.set $errno
+      (call $fd_write
+        (global.get $stdout)
+        (global.get $iovecOffset)
+        (global.get $iovecLength)
+        (global.get $nwrittenOffset)
+      )
     )
 
-    ;; fd_write returns return code, just drop
-    drop
+    (if (local.get $errno)
+      (then (call $proc_exit (local.get $errno)))
+    )
+
+    (call $proc_exit (i32.const 0))
   )
 )
