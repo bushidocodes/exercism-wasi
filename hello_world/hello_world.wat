@@ -13,7 +13,7 @@
   (data (i32.const 64) "Hello, World!\n")
 
   ;; Returns the base offset and byte length of the greeting
-  (func $hello (export "hello") (result i32 i32)
+  (func $hello (result i32 i32)
     (i32.const 64) (i32.const 14)
   )
 
