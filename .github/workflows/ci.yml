@@ -16,7 +16,7 @@ jobs:
             | tar -xJ --strip-components=1 -C /usr/local/bin "wasmtime-v${WASMTIME_VERSION}-x86_64-linux/wasmtime"
 
       - name: Validate WAT syntax
-        run: wat2wasm --validate hello_world/hello_world.wat -o /dev/null
+        run: wat2wasm hello_world/hello_world.wat -o /dev/null
 
       - name: Clean build (no stale artifacts)
         run: make -C hello_world clean && make -C hello_world
