@@ -1,0 +1,29 @@
+name: CI
+on: [push, pull_request]
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install wabt
+        run: sudo apt-get install -y wabt
+
+      - name: Install wasmtime
+        run: |
+          WASMTIME_VERSION=$(curl -sSf https://api.github.com/repos/bytecodealliance/wasmtime/releases/latest | grep '"tag_name"' | sed 's/.*"v\([^"]*\)".*/\1/')
+          curl -sSfL "https://github.com/bytecodealliance/wasmtime/releases/download/v${WASMTIME_VERSION}/wasmtime-v${WASMTIME_VERSION}-x86_64-linux.tar.xz" \
+            | tar -xJ --strip-components=1 -C /usr/local/bin "wasmtime-v${WASMTIME_VERSION}-x86_64-linux/wasmtime"
+
+      - name: Validate WAT syntax
+        run: wat2wasm hello_world/hello_world.wat -o /dev/null
+
+      - name: Clean build (no stale artifacts)
+        run: make -C hello_world clean && make -C hello_world
+
+      - name: Verify runtime output
+        run: |
+          actual=$(make -C hello_world run 2>&1)
+          expected="Hello, World!"
+          echo "Got: $actual"
+          echo "$actual" | grep -qF "$expected" && echo "PASS" || (echo "FAIL"; exit 1)
